@@ -18,6 +18,15 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   List<Country>? _allCountries;
+  bool _sortAscending = true;
+
+  void _applySort() {
+    if (_allCountries == null) return;
+    _allCountries!.sort((a, b) {
+      final cmp = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+      return _sortAscending ? cmp : -cmp;
+    });
+  }
 
   @override
   void initState() {
@@ -75,6 +84,16 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Countries'),
         actions: [
           IconButton(
+            icon: Icon(_sortAscending ? Icons.sort_by_alpha : Icons.sort_by_alpha_outlined),
+            tooltip: _sortAscending ? 'Sort A → Z' : 'Sort Z → A',
+            onPressed: () {
+              setState(() {
+                _sortAscending = !_sortAscending;
+                _applySort();
+              });
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.favorite),
             onPressed: () {
               Navigator.push(
@@ -82,7 +101,7 @@ class _HomePageState extends State<HomePage> {
                 MaterialPageRoute(builder: (_) => const FavoritePage()),
               );
             },
-          )
+          ),
         ],
       ),
       body: FutureBuilder<List<Country>>(
@@ -105,6 +124,8 @@ class _HomePageState extends State<HomePage> {
           final list = snapshot.data!;
           // cache fetched list so filtering doesn't depend on snapshot data identity
           _allCountries ??= list;
+          // ensure cached list is sorted according to current preference
+          _applySort();
           final source = _allCountries!;
           final filtered = source.where((c) {
             final q = _searchQuery.toLowerCase();

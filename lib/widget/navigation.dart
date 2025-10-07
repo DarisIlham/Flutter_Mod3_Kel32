@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../screens/home.dart';
 import '../screens/profile.dart';
 import '../screens/favorite.dart';
+import '../main.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
@@ -24,8 +25,17 @@ class _NavigationPageState extends State<NavigationPage> {
       const FavoritePage(),
       ProfilePage(onHomeTap: () => _onTabTapped(0)),
     ];
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       body: pages[_currentIndex],
+      floatingActionButton: FloatingActionButton(
+        child: Icon(isDark ? Icons.wb_sunny : Icons.nightlight_round),
+        onPressed: () {
+          // Toggle theme in the app state
+          final appState = CountryApp.of(context);
+          appState?.toggleTheme();
+        },
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
